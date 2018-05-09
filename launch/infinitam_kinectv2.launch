@@ -1,1 +1,58 @@
-infinitam_kinectv2.launch
+<launch>
+  
+  <arg name="record" default="false" />
+  <arg name="record_prefix" default="kinectv2" />
+
+  
+  <arg name="playback" default="false" />
+  <arg name="playback_file" default="" />
+  
+  <node pkg="rosbag" type="record" name="rosbag_record_kinectv2"
+        args="-o $(arg record_prefix)
+              /kinect2/bond
+              /kinect2/hd/camera_info
+              /kinect2/hd/image_color/compressed
+              /kinect2/sd/camera_info
+              /kinect2/sd/image_color_rect
+              /kinect2/sd/image_depth_rect
+			  /tfsensors/imu1
+              /tf
+              /tf_static"
+        if="$(arg record)" />
+
+
+  <include unless="$(arg playback)"
+           file="$(find kinect2_bridge)/launch/kinect2_bridge.launch">
+    <arg name="publish_tf" value="true" />
+    <arg name="max_depth" value="7" />
+  </include>
+
+
+  <node unless="$(arg playback)"
+        pkg="tinkerforge_sensors" type="tinkerforge_sensors_node" name="imu_node">
+    <param name="rate" type="int" value="500"/>
+	<!-- Note: This (rosparam) should point to a yaml config file with the IMU UID and set frame_id to 'imu_link' -->
+	<rosparam param="sensor_conf" file="$(find tinkerforge_sensors)/launch/conf.yaml" />
+  </node>
+
+
+  <node pkg="tf" type="static_transform_publisher" name="rgb_to_imu_tf"
+        args="0.0 0.0 0.0 0.0 0.0 1.5707963268 kinect2_ir_optical_frame imu_link 100" />
+  <!-- Current IMU configuration is -90 deg about X -->
+
+
+  <node name="infinitam_ros" pkg="InfiniTAM" type="InfiniTAM" output="screen">
+		<remap from="/camera/depth/image_raw" to="/kinect2/sd/image_depth_rect" />
+		<remap from="/camera/rgb/image_color" to="/kinect2/sd/image_color_rect" />
+		<remap from="/camera/camera_info" to="/kinect2/sd/camera_info" />
+  </node>
+
+
+
+  
+  <node pkg="rosbag" type="play" name="rosbag_play_kinectv2"
+        args="$(arg playback_file) -d 2 --clock"
+		if="$(arg playback)" />
+  
+
+</launch>
