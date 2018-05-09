@@ -165,18 +165,13 @@ try
 	const char *arg3 = NULL;
 	const char *arg4 = NULL;
 
-	int arg = 1;
-	do {
-		if (argv[arg] != NULL) arg1 = argv[arg]; else break;
-		++arg;
-		if (argv[arg] != NULL) arg2 = argv[arg]; else break;
-		++arg;
-		if (argv[arg] != NULL) arg3 = argv[arg]; else break;
-		++arg;
-		if (argv[arg] != NULL) arg4 = argv[arg]; else break;
-	} while (false);
 
-	if (arg == 1) {
+	if(argc > 1){ arg1 = argv[1]; }
+	if(argc > 2){ arg2 = argv[2]; }
+	if(argc > 3){ arg3 = argv[3]; }
+	if(argc > 4){ arg4 = argv[4]; }
+
+	if (argc == 1) {
 		printf("usage: %s [<calibfile> [<imagesource>] ]\n"
 		       "  <calibfile>   : path to a file containing intrinsic calibration parameters\n"
 		       "  <imagesource> : either one argument to specify OpenNI device ID\n"
@@ -199,6 +194,11 @@ try
 	}
 
 	ITMLibSettings *internalSettings = new ITMLibSettings();
+	internalSettings->sceneParams.viewFrustum_max = 8.f; // default is 3
+	internalSettings->sceneParams.voxelSize = 0.01f;
+	internalSettings->sceneParams.mu = 0.03f;
+	internalSettings->createMeshingEngine = false;
+	internalSettings->libMode = ITMLibSettings::LIBMODE_LOOPCLOSURE;
 
 	ITMMainEngine *mainEngine = NULL;
 	switch (internalSettings->libMode)

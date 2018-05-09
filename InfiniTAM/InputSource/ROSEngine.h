@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
@@ -31,8 +32,8 @@ class ROSEngine : public BaseImageSourceEngine
 private:
 	ros::NodeHandle nh_;
 	ros::Subscriber rgb_sub_, depth_sub_;
-	ITMUChar4Image rgb_image_;
-	ITMShortImage depth_image_;
+	ITMUChar4Image* rgb_image_;
+	ITMShortImage* depth_image_;
 	std::thread topic_listener_thread;
 	std::mutex images_mutex_;
 

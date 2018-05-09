@@ -22,6 +22,10 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters
 )
 
+find_package(catkin_simple REQUIRED)
+catkin_simple(ALL_DEPS_REQUIRED)
+
+
 find_package(Boost REQUIRED
   system
 )
@@ -31,12 +35,12 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-catkin_package(
+#catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES using_markers
 #  CATKIN_DEPENDS roscpp visualization_msgs
 #  DEPENDS system_lib
-)
+#)
 
 #################################
 # Add additional compiler flags #
@@ -70,3 +74,7 @@ ADD_SUBDIRECTORY(InfiniTAM/InputSource)
 ADD_SUBDIRECTORY(InfiniTAM/ITMLib)
 ADD_SUBDIRECTORY(InfiniTAM/MiniSlamGraphLib)
 ADD_SUBDIRECTORY(InfiniTAM/ORUtils)
+
+
+cs_install()
+cs_export()

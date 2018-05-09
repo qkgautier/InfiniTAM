@@ -2,7 +2,7 @@
 # UseOpenMP.cmake #
 ###################
 
-OPTION(WITH_OPENMP "Enable OpenMP support?" OFF)
+OPTION(WITH_OPENMP "Enable OpenMP support?" ON)
 
 IF(WITH_OPENMP)
   FIND_PACKAGE(OpenMP)
