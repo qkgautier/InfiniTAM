@@ -1,12 +1,30 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>InfiniTAM</name>
-  <version>3.0.0</version>
-  <description>InfiniTAM ROS package</description>
+  <name>infinitam</name>
+  <version>3.5.0</version>
+  <description>The InfiniTAM package</description>
 
-  <maintainer email="ravich3141@gmail.com">ravich</maintainer>
+  <maintainer email="tommaso@robots.ox.ac.uk">Tommaso Cavallari</maintainer>
+  <maintainer email="smg@robots.ox.ac.uk">Stuart Golodetz</maintainer>
+  <maintainer email="olaf@robots.ox.ac.uk">Olaf Kaehler</maintainer>
+  <maintainer email="victor@robots.ox.ac.uk">Victor Adrian Prisacariu</maintainer>
 
-  <license>TODO</license>
+  <license>Custom (see LICENSE file)</license>
+
+  <url type="website">http://www.infinitam.org</url>
+  <url type="repository">https://github.com/victorprad/InfiniTAM</url>
+
+  <author email="tommaso@robots.ox.ac.uk">Tommaso Cavallari</author>
+  <author email="cmm.thu@gmail.com">Ming Ming Cheng</author>
+  <author email="smg@robots.ox.ac.uk">Stuart Golodetz</author>
+  <author email="olaf@robots.ox.ac.uk">Olaf Kaehler</author>
+  <author email="dwm@robots.ox.ac.uk">David W. Murray</author>
+  <author email="victor@robots.ox.ac.uk">Victor Adrian Prisacariu</author>
+  <author email="ian.reid@adelaide.edu.au">Ian D Reid</author>
+  <author email="carl@robots.ox.ac.uk">Carl Yuheng Ren</author>
+  <author email="michael.sapienza@eng.ox.ac.uk">Michael Sapienza</author>
+  <author email="xin.sun@st-hughs.ox.ac.uk">Xin Sun</author>
+  <author email="philip.torr@eng.ox.ac.uk">Philip H. S. Torr</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
@@ -22,4 +40,6 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>message_filters</exec_depend>
 
+  <export>
+  </export>
 </package>

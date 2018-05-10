@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(InfiniTAM)
+PROJECT(infinitam)
 
 #################################
 # Specify the CMake module path #
@@ -42,6 +42,12 @@ include_directories(
 #  DEPENDS system_lib
 #)
 
+#####################
+# Offer ROS Support (Disable as my modifications were based on a pull request and not on infinitam_v3.5) #
+#####################
+
+#INCLUDE(${PROJECT_SOURCE_DIR}/cmake/OfferROSSupport.cmake)
+
 #################################
 # Add additional compiler flags #
 #################################
@@ -68,12 +74,12 @@ ENDIF()
 # Add subdirectories #
 ######################
 
-ADD_SUBDIRECTORY(InfiniTAM/Apps)
-ADD_SUBDIRECTORY(InfiniTAM/FernRelocLib)
-ADD_SUBDIRECTORY(InfiniTAM/InputSource)
-ADD_SUBDIRECTORY(InfiniTAM/ITMLib)
-ADD_SUBDIRECTORY(InfiniTAM/MiniSlamGraphLib)
-ADD_SUBDIRECTORY(InfiniTAM/ORUtils)
+ADD_SUBDIRECTORY(Apps)
+ADD_SUBDIRECTORY(FernRelocLib)
+ADD_SUBDIRECTORY(InputSource)
+ADD_SUBDIRECTORY(ITMLib)
+ADD_SUBDIRECTORY(MiniSlamGraphLib)
+ADD_SUBDIRECTORY(ORUtils)
 
 
 cs_install()

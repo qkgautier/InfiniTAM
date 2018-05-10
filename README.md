@@ -27,6 +27,15 @@ The following 3rd party libraries are needed for compiling InfiniTAM. The given 
 
   - Boost
 
+  - librealsense2 (e.g. Intel® RealSense™ SDK 2.X)
+    OPTIONAL, allows to get live images from Intel Realsense cameras
+    available at https://github.com/IntelRealSense/librealsense
+
+  - libuvc (e.g. github version from 2015-OCT-27)
+    OPTIONAL, deprecated alternative to librealsense
+    currently this works only with branch olafkaehler/master
+    available at https://github.com/olafkaehler/libuvc
+
 ## Build Process (for infinitam_ros branch)
 
 infinitam\_ros is catkinized, so you can clone it into your catkin workspace's src/ directory and run `catkin_make' from the workspace directory. 
