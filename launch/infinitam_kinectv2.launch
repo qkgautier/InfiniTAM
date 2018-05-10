@@ -1,6 +1,6 @@
 <launch>
   
-  <arg name="record" default="false" />
+  <arg name="record" default="true" />
   <arg name="record_prefix" default="kinectv2" />
 
   
