@@ -4,6 +4,7 @@
 
 #include "../Engines/LowLevel/ITMLowLevelEngineFactory.h"
 #include "../Engines/Meshing/ITMMeshingEngineFactory.h"
+#include "../Engines/Meshing/CPU/ITMExportEngine_CPU.h"
 #include "../Engines/ViewBuilding/ITMViewBuilderFactory.h"
 #include "../Engines/Visualisation/ITMVisualisationEngineFactory.h"
 #include "../Objects/RenderStates/ITMRenderStateFactory.h"
@@ -59,6 +60,12 @@ ITMBasicEngine<TVoxel,TIndex>::ITMBasicEngine(const ITMLibSettings *settings, co
 
 	kfRaycast = new ITMUChar4Image(imgSize_d, memoryType);
 
+	exportEngine = NULL;
+	if(deviceType == DEVICE_CPU)
+	{
+		exportEngine = new ITMExportEngine_CPU<TVoxel,TIndex>(scene, trackingState);
+	}
+
 	trackingActive = true;
 	fusionActive = true;
 	mainProcessingActive = true;
@@ -93,6 +100,7 @@ ITMBasicEngine<TVoxel,TIndex>::~ITMBasicEngine()
 	delete kfRaycast;
 
 	if (meshingEngine != NULL) delete meshingEngine;
+	if (exportEngine != NULL) delete exportEngine;
 }
 
 template <typename TVoxel, typename TIndex>
@@ -106,6 +114,12 @@ void ITMBasicEngine<TVoxel,TIndex>::SaveSceneToMesh(const char *objFileName)
 	mesh->WriteSTL(objFileName);
 
 	delete mesh;
+}
+
+template <typename TVoxel, typename TIndex>
+void ITMBasicEngine<TVoxel,TIndex>::SaveTSDFToFile(const char *filename)
+{
+	exportEngine->ExportTSDFToPcd(filename);
 }
 
 template <typename TVoxel, typename TIndex>

@@ -78,6 +78,9 @@ namespace ITMLib
 
 		/// Extracts a mesh from the current scene and saves it to the model file specified by the file name
 		virtual void SaveSceneToMesh(const char *fileName) { };
+		
+		/// Save the TSDF as a point cloud
+		virtual void SaveTSDFToFile(const char *filename) { };
 
 		/// save and load the full scene and relocaliser (if any) to/from file
 		virtual void SaveToFile() { };

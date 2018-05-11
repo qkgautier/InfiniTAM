@@ -7,6 +7,7 @@
 #include "ITMTrackingController.h"
 #include "../Engines/LowLevel/Interface/ITMLowLevelEngine.h"
 #include "../Engines/Meshing/Interface/ITMMeshingEngine.h"
+#include "../Engines/Meshing/Interface/ITMExportEngine.h"
 #include "../Engines/ViewBuilding/Interface/ITMViewBuilder.h"
 #include "../Engines/Visualisation/Interface/ITMVisualisationEngine.h"
 #include "../Objects/Misc/ITMIMUCalibrator.h"
@@ -28,6 +29,7 @@ namespace ITMLib
 		ITMVisualisationEngine<TVoxel, TIndex> *visualisationEngine;
 
 		ITMMeshingEngine<TVoxel, TIndex> *meshingEngine;
+		ITMExportEngine<TVoxel, TIndex> *exportEngine;
 
 		ITMViewBuilder *viewBuilder;
 		ITMDenseMapper<TVoxel, TIndex> *denseMapper;
@@ -60,6 +62,9 @@ namespace ITMLib
 
 		/// Extracts a mesh from the current scene and saves it to the model file specified by the file name
 		void SaveSceneToMesh(const char *fileName);
+
+		/// Save the TSDF as a point cloud
+		void SaveTSDFToFile(const char *filename);
 
 		/// save and load the full scene and relocaliser (if any) to/from file
 		void SaveToFile();

@@ -17,6 +17,9 @@
 #endif
 #endif
 
+#include <chrono>
+#include <sstream>
+
 #include "../../ITMLib/ITMLibDefines.h"
 #include "../../ITMLib/Core/ITMBasicEngine.h"
 #include "../../ITMLib/Core/ITMBasicSurfelEngine.h"
@@ -167,6 +170,12 @@ void UIEngine::glutKeyUpFunction(unsigned char key, int x, int y)
 {
 	UIEngine *uiEngine = UIEngine::Instance();
 
+	// Note: requires c++11
+	std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+	std::time_t current_time = std::chrono::system_clock::to_time_t(now);
+	std::stringstream ss;
+	std::string ss_str;
+
 	switch (key)
 	{
 	case 'n':
@@ -178,6 +187,15 @@ void UIEngine::glutKeyUpFunction(unsigned char key, int x, int y)
 		uiEngine->mainLoopAction = UIEngine::PROCESS_VIDEO;
 		break;
 	case 's':
+		char mbstr[100];
+		std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S", std::localtime(&current_time));
+		ss << "world_" << mbstr << ".pcd";
+		ss_str = ss.str();
+		printf("Saving TSDF to \"%s\" ...", ss_str.c_str()); fflush(stdout);
+		uiEngine->mainEngine->SaveTSDFToFile(ss_str.c_str());
+		printf(" done\n");
+		break;
+	case 'g':
 		if (uiEngine->isRecording)
 		{
 			printf("stopped recoding disk ...\n");
