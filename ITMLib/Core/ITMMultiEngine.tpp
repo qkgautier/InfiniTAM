@@ -65,6 +65,8 @@ ITMMultiEngine<TVoxel, TIndex>::ITMMultiEngine(const ITMLibSettings *settings, c
 
 	multiVisualisationEngine = ITMMultiVisualisationEngineFactory::MakeVisualisationEngine<TVoxel,TIndex>(deviceType);
 	renderState_multiscene = NULL;
+	
+	exportEngine = ITMMultiExportEngineFactory::MakeExportEngine<TVoxel, TIndex>(deviceType, mapManager);
 }
 
 template <typename TVoxel, typename TIndex>
@@ -94,6 +96,9 @@ ITMMultiEngine<TVoxel, TIndex>::~ITMMultiEngine(void)
 	delete relocaliser;
 
 	delete multiVisualisationEngine;
+
+	if (meshingEngine != NULL) delete meshingEngine;
+	if (exportEngine != NULL) delete exportEngine;
 }
 
 template <typename TVoxel, typename TIndex>
@@ -308,6 +313,16 @@ void ITMMultiEngine<TVoxel, TIndex>::SaveSceneToMesh(const char *modelFileName)
 	mesh->WriteSTL(modelFileName);
 	
 	delete mesh;
+}
+
+template <typename TVoxel, typename TIndex>
+void ITMMultiEngine<TVoxel,TIndex>::SaveTSDFToFile(const char *filename)
+{
+	if (exportEngine == NULL)
+	{
+		std::cerr << "Warning: no export engine!" << std::endl;
+	}
+	exportEngine->ExportTSDFToPcd(filename);
 }
 
 template <typename TVoxel, typename TIndex>

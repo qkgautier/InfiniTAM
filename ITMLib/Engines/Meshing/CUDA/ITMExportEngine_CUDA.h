@@ -23,14 +23,10 @@ namespace ITMLib
 
 		private:
 
-			int countVoxelsInBlock(const TVoxel* voxelBlocks, int block_ptr);
-
 			void getVoxelsFromPtrList(int noBlocks,
 					const TVoxel* voxelBlocks_device,
 					int* blockPtr_host,
 					TVoxel* voxels_host);
-
-			void exportVoxelsInBlock(std::ofstream& file, const TVoxel* voxelBlocks, int block_ptr, Vector3s blockPos);
 
 			bool ExportTSDFToPcd_hashIndex(ITMScene<TVoxel, ITMVoxelBlockHash>* scene, const char *filename);
 	};

@@ -131,6 +131,7 @@ Engines/Meshing/Shared/ITMMultiMeshingEngine_Shared.h
 ##
 SET(ITMLIB_ENGINES_EXPORT_HEADERS
 Engines/Meshing/ITMExportEngineFactory.h
+Engines/Meshing/ITMMultiExportEngineFactory.h
 )
 
 ##
@@ -140,6 +141,7 @@ Engines/Meshing/CPU/ITMExportEngine_CPU.tpp
 
 SET(ITMLIB_ENGINES_EXPORT_CPU_HEADERS
 Engines/Meshing/CPU/ITMExportEngine_CPU.h
+Engines/Meshing/CPU/ITMMultiExportEngine_CPU.h
 )
 
 ##
@@ -149,11 +151,18 @@ Engines/Meshing/CUDA/ITMExportEngine_CUDA.tcu
 
 SET(ITMLIB_ENGINES_EXPORT_CUDA_HEADERS
 Engines/Meshing/CUDA/ITMExportEngine_CUDA.h
+Engines/Meshing/CUDA/ITMMultiExportEngine_CUDA.h
 )
 
 ##
 SET(ITMLIB_ENGINES_EXPORT_INTERFACE_HEADERS
 Engines/Meshing/Interface/ITMExportEngine.h
+Engines/Meshing/Interface/ITMMultiExportEngine.h
+)
+
+##
+SET(ITMLIB_ENGINES_EXPORT_SHARED_HEADERS
+	Engines/Meshing/Shared/ITMExportEngine_Shared.h
 )
 
 ##
@@ -548,6 +557,7 @@ ${ITMLIB_ENGINES_EXPORT_HEADERS}
 ${ITMLIB_ENGINES_EXPORT_INTERFACE_HEADERS}
 ${ITMLIB_ENGINES_EXPORT_CPU_HEADERS}
 ${ITMLIB_ENGINES_EXPORT_CUDA_HEADERS}
+${ITMLIB_ENGINES_EXPORT_SHARED_HEADERS}
 ${ITMLIB_ENGINES_MULTISCENE_HEADERS}
 ${ITMLIB_ENGINES_RECONSTRUCTION_HEADERS}
 ${ITMLIB_ENGINES_RECONSTRUCTION_CPU_HEADERS}
