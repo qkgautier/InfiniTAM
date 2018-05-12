@@ -8,6 +8,7 @@
 #include "Core/ITMDenseSurfelMapper.tpp"
 #include "Engines/Meshing/CPU/ITMMeshingEngine_CPU.tpp"
 #include "Engines/Meshing/CPU/ITMMultiMeshingEngine_CPU.tpp"
+#include "Engines/Meshing/CPU/ITMExportEngine_CPU.tpp"
 #include "Engines/MultiScene/ITMMapGraphManager.tpp"
 #include "Engines/Visualisation/CPU/ITMMultiVisualisationEngine_CPU.tpp"
 #include "Engines/Reconstruction/ITMSurfelSceneReconstructionEngineFactory.tpp"
@@ -33,6 +34,7 @@ namespace ITMLib
 	template class ITMVisualisationEngine_CPU<ITMVoxel, ITMVoxelIndex>;
 	template class ITMMeshingEngine_CPU<ITMVoxel, ITMVoxelIndex>;
 	template class ITMMultiMeshingEngine_CPU<ITMVoxel, ITMVoxelIndex>;
+	template class ITMExportEngine_CPU<ITMVoxel, ITMVoxelIndex>;
 	template class ITMSwappingEngine_CPU<ITMVoxel, ITMVoxelIndex>;
 	template class ITMSceneReconstructionEngine_CPU<ITMVoxel, ITMVoxelIndex>;
 
