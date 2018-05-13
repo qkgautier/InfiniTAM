@@ -33,9 +33,13 @@ namespace ITMLib
 		}
 
 	template<class TVoxel, class TIndex>
-		void exportVoxelsInBlock(std::ofstream& file, const TVoxel* voxelBlocks, int block_ptr, Vector3s blockPos)
+		void exportVoxelsInBlock(std::ofstream& file, const TVoxel* voxelBlocks, int block_ptr, Vector3s blockPos, Matrix4f* invM = 0)
 		{
 			Vector3f pointPos = blockPos.toFloat() * SDF_BLOCK_SIZE;
+			if(invM != 0)
+			{
+				pointPos = (*invM) * pointPos;
+			}
 
 			for(int z = 0; z < SDF_BLOCK_SIZE; z++)
 			{

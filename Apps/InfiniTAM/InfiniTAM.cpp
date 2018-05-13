@@ -209,8 +209,8 @@ try
 	internalSettings->sceneParams.voxelSize = 0.01f;
 	internalSettings->sceneParams.mu = 0.03f;
 	internalSettings->createMeshingEngine = false;
-	internalSettings->libMode = ITMLibSettings::LIBMODE_BASIC;
-	internalSettings->deviceType = DEVICE_CUDA;
+	internalSettings->libMode = ITMLibSettings::LIBMODE_LOOPCLOSURE;
+	internalSettings->deviceType = DEVICE_CPU;
 
 	ITMMainEngine *mainEngine = NULL;
 	switch (internalSettings->libMode)

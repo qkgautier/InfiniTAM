@@ -137,6 +137,7 @@ Engines/Meshing/ITMMultiExportEngineFactory.h
 ##
 SET(ITMLIB_ENGINES_EXPORT_CPU_SOURCES
 Engines/Meshing/CPU/ITMExportEngine_CPU.tpp
+Engines/Meshing/CPU/ITMMultiExportEngine_CPU.tpp
 )
 
 SET(ITMLIB_ENGINES_EXPORT_CPU_HEADERS
