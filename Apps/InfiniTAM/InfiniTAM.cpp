@@ -210,7 +210,7 @@ try
 	internalSettings->sceneParams.mu = 0.03f;
 	internalSettings->createMeshingEngine = false;
 	internalSettings->libMode = ITMLibSettings::LIBMODE_LOOPCLOSURE;
-	internalSettings->deviceType = DEVICE_CPU;
+	internalSettings->deviceType = DEVICE_CUDA;
 
 	ITMMainEngine *mainEngine = NULL;
 	switch (internalSettings->libMode)

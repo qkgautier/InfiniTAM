@@ -2,6 +2,7 @@
 #include "ITMExportEngine_CUDA.h"
 
 #include "../Shared/ITMExportEngine_Shared.h"
+#include "ITMExportEngine_CUDA_Shared.tcu"
 #include "../../../../ORUtils/CUDADefines.h"
 
 #include <fstream>
@@ -9,58 +10,12 @@
 
 using namespace ITMLib;
 
-namespace ITMLib
-{
-	template<class TVoxel>
-		__global__ void getVoxelsFromPtrList_device(int noBlocks, int voxelsPerBlock, const int* blockPtr,
-				const TVoxel* voxels_in, TVoxel* voxels_out)
-		{
-			int targetIdx = threadIdx.x + blockIdx.x * blockDim.x;
-			if (targetIdx > noBlocks - 1) return;
-
-			for(int i = 0; i < voxelsPerBlock; i++)
-			{
-				voxels_out[targetIdx * voxelsPerBlock + i] =
-					voxels_in[blockPtr[targetIdx] * voxelsPerBlock + i];
-			}
-		}
-}
-
 
 namespace ITMLib
 {
-	template<class TVoxel, class TIndex>
-		void ITMExportEngine_CUDA<TVoxel, TIndex>::
-		getVoxelsFromPtrList(int noBlocks,
-				const TVoxel* voxelBlocks_device,
-				int* blockPtr_host,
-				TVoxel* voxels_host)
-		{
-			TVoxel* voxels_device;
-			int* blockPtr_device;
-
-			ORcudaSafeCall(cudaMalloc((void**)&voxels_device, noBlocks*SDF_BLOCK_SIZE3*sizeof(TVoxel)));
-			ORcudaSafeCall(cudaMalloc((void**)&blockPtr_device, noBlocks*sizeof(int)));
-
-			ORcudaSafeCall(cudaMemcpy(blockPtr_device, blockPtr_host, noBlocks*sizeof(int), cudaMemcpyHostToDevice));
-
-			dim3 cudaBlockSizeAL(256, 1);
-			dim3 gridSizeAL((int)ceil((float)noBlocks / (float)cudaBlockSizeAL.x));
-
-			getVoxelsFromPtrList_device<<<gridSizeAL, cudaBlockSizeAL>>>(
-					noBlocks, SDF_BLOCK_SIZE3, blockPtr_device,
-					voxelBlocks_device, voxels_device);
-
-			ORcudaSafeCall(cudaMemcpy(voxels_host, voxels_device, noBlocks*SDF_BLOCK_SIZE3*sizeof(TVoxel), cudaMemcpyDeviceToHost));
-
-			ORcudaSafeCall(cudaFree(voxels_device));
-			ORcudaSafeCall(cudaFree(blockPtr_device));
-		}
-
 	template<class TVoxel, class TIndex>
 		bool ITMExportEngine_CUDA<TVoxel, TIndex>::ExportTSDFToPcd_hashIndex(
-				ITMScene<TVoxel,
-				ITMVoxelBlockHash>* scene,
+				ITMScene<TVoxel,ITMVoxelBlockHash>* scene,
 				const char *filename)
 		{
 			if(!scene){ return false; }
@@ -111,7 +66,7 @@ namespace ITMLib
 				{
 					localVoxels_host.resize(localPtr.size() * SDF_BLOCK_SIZE3);
 
-					getVoxelsFromPtrList(localPtr.size(), voxelBlocks_local, localPtr.data(), localVoxels_host.data());
+					getVoxelsFromPtrList<TVoxel, TIndex>(localPtr.size(), voxelBlocks_local, localPtr.data(), localVoxels_host.data());
 
 					for(size_t j = 0; j < localPtr.size(); j++)
 					{
@@ -157,7 +112,7 @@ namespace ITMLib
 				{
 					localVoxels_host.resize(localPtr.size() * SDF_BLOCK_SIZE3);
 
-					getVoxelsFromPtrList(localPtr.size(), voxelBlocks_local, localPtr.data(), localVoxels_host.data());
+					getVoxelsFromPtrList<TVoxel, TIndex>(localPtr.size(), voxelBlocks_local, localPtr.data(), localVoxels_host.data());
 
 					for(size_t j = 0; j < localPtr.size(); j++)
 					{

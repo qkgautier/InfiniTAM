@@ -148,6 +148,8 @@ Engines/Meshing/CPU/ITMMultiExportEngine_CPU.h
 ##
 SET(ITMLIB_ENGINES_EXPORT_CUDA_SOURCES
 Engines/Meshing/CUDA/ITMExportEngine_CUDA.tcu
+Engines/Meshing/CUDA/ITMExportEngine_CUDA_Shared.tcu
+Engines/Meshing/CUDA/ITMMultiExportEngine_CUDA.tcu
 )
 
 SET(ITMLIB_ENGINES_EXPORT_CUDA_HEADERS

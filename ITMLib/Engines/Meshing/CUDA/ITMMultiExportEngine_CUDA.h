@@ -16,18 +16,27 @@ namespace ITMLib
 			ITMMultiExportEngine_CUDA(ITMVoxelMapGraphManager<TVoxel, TIndex>* sceneManager = 0, ITMTrackingState* tracking = 0):
 				ITMMultiExportEngine<TVoxel, TIndex>(sceneManager, tracking) {}
 
-			virtual ~ITMMultiExportEngine_CUDA(){}
+			virtual ~ITMMultiExportEngine_CUDA()
+			{
+				for(size_t i = 0; i < hashTable_v.size(); i++)
+				{
+					delete hashTable_v[i];
+				}
+			}
 
-			virtual bool ExportTSDFToPcd(const char* filename){ return false; }
+			virtual bool ExportTSDFToPcd(const char* filename);
 
+	public:
+		typedef typename ITMMultiIndex<ITMVoxelBlockHash>::IndexData MultiIndexData;
+		typedef ITMMultiVoxel<TVoxel> MultiVoxelData;
+		typedef ITMVoxelMapGraphManager<TVoxel, ITMVoxelBlockHash> MultiSceneManager;
 
 		private:
 
-			void getVoxelsFromPtrList(int noBlocks,
-					const TVoxel* voxelBlocks_device,
-					int* blockPtr_host,
-					TVoxel* voxels_host);
+			bool ExportTSDFToPcd_hashIndex(ITMVoxelMapGraphManager<TVoxel, ITMVoxelBlockHash>* sceneManager, const char *filename);
 
-			bool ExportTSDFToPcd_hashIndex(ITMVoxelMapGraphManager<TVoxel, ITMVoxelBlockHash> sceneManager, const char *filename);
+
+			std::vector< ORUtils::MemoryBlock<ITMHashEntry>* > hashTable_v;
+
 	};
 }
