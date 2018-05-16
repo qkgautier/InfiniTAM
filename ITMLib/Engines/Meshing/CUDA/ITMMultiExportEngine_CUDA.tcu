@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 
 using namespace ITMLib;
@@ -16,7 +17,7 @@ namespace ITMLib
 {
 
 	template<class TVoxel, class TIndex>
-		bool ITMMultiExportEngine_CUDA<TVoxel, TIndex>::ExportTSDFToPcd_hashIndex(ITMVoxelMapGraphManager<TVoxel, ITMVoxelBlockHash>* sceneManager, const char *filename)
+		bool ITMMultiExportEngine_CUDA<TVoxel, TIndex>::ExportTSDFToPcd_hashIndex(ITMVoxelMapGraphManager<TVoxel, ITMVoxelBlockHash>* sceneManager, const char *basename)
 		{
 			if(!sceneManager){ return false; }
 
@@ -44,6 +45,12 @@ namespace ITMLib
 				hashTable_v[i] = new ORUtils::MemoryBlock<ITMHashEntry>(1, MEMORYDEVICE_CPU);
 			}
 
+
+			std::stringstream poses_filename_ss;
+			poses_filename_ss << basename << ".txt";
+			std::string poses_filename = poses_filename_ss.str();
+			std::ofstream poses_file(poses_filename.c_str());
+
 			int noEntries = ITMVoxelBlockHash::noTotalEntries;
 			int noPointsTotal = 0;
 			
@@ -61,6 +68,15 @@ namespace ITMLib
 
 				ITMScene<TVoxel, TIndex>* scene = sceneManager->getLocalMap(localMapId)->scene;
 
+				const Matrix4f& M = sceneManager->getEstimatedGlobalPose(localMapId).GetM();
+				const Matrix4f& invM = sceneManager->getEstimatedGlobalPose(localMapId).GetInvM();
+				for(int y = 0; y < 4; y++)
+					poses_file << M(0, y) << "," << M(1, y) << "," << M(2, y) << "," << M(3, y) << ",";
+				poses_file << "\n";
+				for(int y = 0; y < 4; y++)
+					poses_file << invM(0, y) << "," << invM(1, y) << "," << invM(2, y) << "," << invM(3, y) << ",";
+				poses_file << "\n";
+				
 
 
 				ITMGlobalCache<TVoxel>* cache = scene->globalCache;
@@ -86,6 +102,7 @@ namespace ITMLib
 				{
 					ORcudaSafeCall(cudaMemcpy(swapStates_v[localMapId].data(), cache->GetSwapStates(true), noEntries*sizeof(ITMHashSwapState), cudaMemcpyDeviceToHost));
 				}
+
 
 
 				const size_t MAX_BLOCKS_TRANSFER_SIZE = 512;
@@ -120,38 +137,33 @@ namespace ITMLib
 				}
 
 				noPointsTotal += noPoints;
-			}
 
-			if(noPointsTotal <= 0){ return false; }
+				if(noPoints <= 0){ return false; }
 
-			std::ofstream file(filename);
-			if(!file.is_open()){ return false; }
+				std::stringstream pc_filename_ss;
+				pc_filename_ss << basename << "_" << localMapId << ".pcd";
+				std::string pc_filename = pc_filename_ss.str();
+				std::ofstream file(pc_filename.c_str());
+				if(!file.is_open()){ return false; }
 
-			file << "VERSION 0.7\n";
-			file << "FIELDS x y z " << (TVoxel::hasColorInformation? "rgb": "") << " intensity\n";
-			file << "SIZE 4 4 4 " << (TVoxel::hasColorInformation? "4": "") << " 4\n";
-			file << "TYPE F F F " << (TVoxel::hasColorInformation? "F": "") << " F\n";
-			file << "COUNT 1 1 1 " << (TVoxel::hasColorInformation? "1": "") << " 1\n";
-			file << "WIDTH " << noPointsTotal << "\n";
-			file << "HEIGHT 1\n";
-			file << "VIEWPOINT 0 0 0 1 0 0 0\n";
-			file << "POINTS " << noPointsTotal << "\n";
-			file << "DATA binary\n";
+				file << "VERSION 0.7\n";
+				file << "FIELDS x y z " << (TVoxel::hasColorInformation? "rgb": "") << " intensity\n";
+				file << "SIZE 4 4 4 " << (TVoxel::hasColorInformation? "4": "") << " 4\n";
+				file << "TYPE F F F " << (TVoxel::hasColorInformation? "F": "") << " F\n";
+				file << "COUNT 1 1 1 " << (TVoxel::hasColorInformation? "1": "") << " 1\n";
+				file << "WIDTH " << noPoints << "\n";
+				file << "HEIGHT 1\n";
+				file << "VIEWPOINT 0 0 0 1 0 0 0\n";
+				file << "POINTS " << noPoints << "\n";
+				file << "DATA binary\n";
 
 
-			for (int localMapId = 0; localMapId < numLocalMaps; ++localMapId)
-			{
-				ITMHashEntry* hash = hashTables.index[localMapId];
-				
-				const size_t MAX_BLOCKS_TRANSFER_SIZE = 512;
-				std::vector<int> localPtr;
 				std::vector<Vector3s> localPtrPos;
-				std::vector<TVoxel> localVoxels_host;
 				for(int i = 0; i < noEntries; i++)
 				{
 					if(hash[i].ptr >= -1 && swapStates_v[localMapId][i].state != 2)
 					{
-						exportVoxelsInBlock<TVoxel, TIndex>(file, voxelBlocks_global_v[localMapId], i, hash[i].pos, &hashTables.posesInv[localMapId]);
+						exportVoxelsInBlock<TVoxel, TIndex>(file, voxelBlocks_global_v[localMapId], i, hash[i].pos);
 					}
 					else if(hash[i].ptr >= 0 && swapStates_v[localMapId][i].state == 2)
 					{
@@ -167,7 +179,7 @@ namespace ITMLib
 
 						for(size_t j = 0; j < localPtr.size(); j++)
 						{
-							exportVoxelsInBlock<TVoxel, TIndex>(file, localVoxels_host.data(), j, localPtrPos[j], &hashTables.posesInv[localMapId]);
+							exportVoxelsInBlock<TVoxel, TIndex>(file, localVoxels_host.data(), j, localPtrPos[j]);
 						}
 
 						localPtr.clear();
@@ -175,9 +187,64 @@ namespace ITMLib
 					}
 				}
 
-
-				//localVBAs.voxels[localMapId] = scene->localVBA.GetVoxelBlocks();
 			}
+
+			//if(noPointsTotal <= 0){ return false; }
+
+			//std::ofstream file(filename);
+			//if(!file.is_open()){ return false; }
+
+			//file << "VERSION 0.7\n";
+			//file << "FIELDS x y z " << (TVoxel::hasColorInformation? "rgb": "") << " intensity\n";
+			//file << "SIZE 4 4 4 " << (TVoxel::hasColorInformation? "4": "") << " 4\n";
+			//file << "TYPE F F F " << (TVoxel::hasColorInformation? "F": "") << " F\n";
+			//file << "COUNT 1 1 1 " << (TVoxel::hasColorInformation? "1": "") << " 1\n";
+			//file << "WIDTH " << noPointsTotal << "\n";
+			//file << "HEIGHT 1\n";
+			//file << "VIEWPOINT 0 0 0 1 0 0 0\n";
+			//file << "POINTS " << noPointsTotal << "\n";
+			//file << "DATA binary\n";
+
+
+			//for (int localMapId = 0; localMapId < numLocalMaps; ++localMapId)
+			//{
+			//	ITMHashEntry* hash = hashTables.index[localMapId];
+			//	
+			//	const size_t MAX_BLOCKS_TRANSFER_SIZE = 512;
+			//	std::vector<int> localPtr;
+			//	std::vector<Vector3s> localPtrPos;
+			//	std::vector<TVoxel> localVoxels_host;
+			//	for(int i = 0; i < noEntries; i++)
+			//	{
+			//		if(hash[i].ptr >= -1 && swapStates_v[localMapId][i].state != 2)
+			//		{
+			//			exportVoxelsInBlock<TVoxel, TIndex>(file, voxelBlocks_global_v[localMapId], i, hash[i].pos, &hashTables.posesInv[localMapId]);
+			//		}
+			//		else if(hash[i].ptr >= 0 && swapStates_v[localMapId][i].state == 2)
+			//		{
+			//			localPtr.push_back(hash[i].ptr);
+			//			localPtrPos.push_back(hash[i].pos);
+			//		}
+
+			//		if(localPtr.size() >= MAX_BLOCKS_TRANSFER_SIZE || (i >= noEntries-1 && !localPtr.empty()))
+			//		{
+			//			localVoxels_host.resize(localPtr.size() * SDF_BLOCK_SIZE3);
+
+			//			getVoxelsFromPtrList<TVoxel, TIndex>(localPtr.size(), voxelBlocks_local_v[localMapId], localPtr.data(), localVoxels_host.data());
+
+			//			for(size_t j = 0; j < localPtr.size(); j++)
+			//			{
+			//				exportVoxelsInBlock<TVoxel, TIndex>(file, localVoxels_host.data(), j, localPtrPos[j], &hashTables.posesInv[localMapId]);
+			//			}
+
+			//			localPtr.clear();
+			//			localPtrPos.clear();
+			//		}
+			//	}
+
+
+			//	//localVBAs.voxels[localMapId] = scene->localVBA.GetVoxelBlocks();
+			//}
 
 			return true;
 		}

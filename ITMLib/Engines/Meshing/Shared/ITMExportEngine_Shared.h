@@ -36,10 +36,10 @@ namespace ITMLib
 		void exportVoxelsInBlock(std::ofstream& file, const TVoxel* voxelBlocks, int block_ptr, Vector3s blockPos, Matrix4f* invM = 0)
 		{
 			Vector3f pointPos = blockPos.toFloat() * SDF_BLOCK_SIZE;
-			if(invM != 0)
-			{
-				pointPos = (*invM) * pointPos;
-			}
+			//if(invM != 0)
+			//{
+			//	pointPos = (*invM) * pointPos;
+			//}
 
 			for(int z = 0; z < SDF_BLOCK_SIZE; z++)
 			{
@@ -55,6 +55,10 @@ namespace ITMLib
 
 						// Export X,Y,Z
 						Vector3f currPointPos = pointPos + Vector3f(x, y, z);
+						if(invM != 0)
+						{
+							currPointPos = (*invM) * currPointPos;
+						}
 						//file << currPointPos.x << " " << currPointPos.y << " " << currPointPos.z << " ";
 						file.write((const char*)&currPointPos, 3 * sizeof(float));
 

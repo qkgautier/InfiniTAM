@@ -189,7 +189,7 @@ void UIEngine::glutKeyUpFunction(unsigned char key, int x, int y)
 	case 's':
 		char mbstr[100];
 		std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S", std::localtime(&current_time));
-		ss << "world_" << mbstr << ".pcd";
+		ss << "world_" << mbstr; // << ".pcd";
 		ss_str = ss.str();
 		printf("Saving TSDF to \"%s\" ...", ss_str.c_str()); fflush(stdout);
 		uiEngine->mainEngine->SaveTSDFToFile(ss_str.c_str());
