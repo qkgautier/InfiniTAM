@@ -26,11 +26,11 @@ namespace ITMLib
 			int numLocalMaps = (int)sceneManager->numLocalMaps();
 			if (numLocalMaps > MAX_NUM_LOCALMAPS) numLocalMaps = MAX_NUM_LOCALMAPS;
 
-			MultiIndexData hashTables;
+			//MultiIndexData hashTables;
 			//MultiVoxelData localVBAs;
 
 			const ITMSceneParams & sceneParams = *(sceneManager->getLocalMap(0)->scene->sceneParams);
-			hashTables.numLocalMaps = numLocalMaps;
+			//hashTables.numLocalMaps = numLocalMaps;
 
 			std::vector<TVoxel*> voxelBlocks_global_v(numLocalMaps);
 			std::vector<TVoxel*> voxelBlocks_local_v(numLocalMaps);
@@ -56,12 +56,12 @@ namespace ITMLib
 			
 			for (int localMapId = 0; localMapId < numLocalMaps; ++localMapId)
 			{
-				hashTables.poses_vs[localMapId] = sceneManager->getEstimatedGlobalPose(localMapId).GetM();
+				//hashTables.poses_vs[localMapId] = sceneManager->getEstimatedGlobalPose(localMapId).GetM();
 				//hashTables.poses_vs[localMapId].m30 /= sceneParams.voxelSize;
 				//hashTables.poses_vs[localMapId].m31 /= sceneParams.voxelSize;
 				//hashTables.poses_vs[localMapId].m32 /= sceneParams.voxelSize;
-				
-				hashTables.posesInv[localMapId] = sceneManager->getEstimatedGlobalPose(localMapId).GetInvM();
+				//
+				//hashTables.posesInv[localMapId] = sceneManager->getEstimatedGlobalPose(localMapId).GetInvM();
 				//hashTables.posesInv[localMapId].m30 /= sceneParams.voxelSize;
 				//hashTables.posesInv[localMapId].m31 /= sceneParams.voxelSize;
 				//hashTables.posesInv[localMapId].m32 /= sceneParams.voxelSize;
@@ -92,7 +92,7 @@ namespace ITMLib
 				scene->index.getEntriesCPUCopy(*hashTable_v[localMapId]);
 				ITMHashEntry* hash = hashTable_v[localMapId]->GetData(MEMORYDEVICE_CPU);
 
-				hashTables.index[localMapId] = hash;
+				//hashTables.index[localMapId] = hash;
 
 				ITMHashSwapState swapStateDefault;
 				swapStateDefault.state = 2;
