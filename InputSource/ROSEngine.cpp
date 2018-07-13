@@ -57,6 +57,7 @@ ROSEngine::ROSEngine(const char *calibFilename,
 	this->calib.disparityCalib.SetStandard(); // assumes depth is in millimeters
 
 	// Wait for camera info
+	printf("Waiting for camera info...\n");
 	sensor_msgs::CameraInfo camInfo = *ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", nh_);
 
 	Vector2i imageSize(camInfo.width, camInfo.height);
