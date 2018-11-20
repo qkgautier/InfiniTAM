@@ -22,7 +22,7 @@ namespace ITMLib
 			{}
 				virtual ~ITMExportEngine(){}
 
-				virtual bool ExportTSDFToPcd(const char* filename) = 0;
+				virtual bool ExportTSDFToPcd(const char* basename) = 0;
 
 				virtual bool ExportPoses(const char* filename)
 				{

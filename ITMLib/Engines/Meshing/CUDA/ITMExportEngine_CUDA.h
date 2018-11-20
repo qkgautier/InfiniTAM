@@ -18,7 +18,7 @@ namespace ITMLib
 
 			virtual ~ITMExportEngine_CUDA(){}
 
-			virtual bool ExportTSDFToPcd(const char* filename);
+			virtual bool ExportTSDFToPcd(const char* basename);
 
 
 		private:

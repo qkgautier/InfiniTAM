@@ -14,7 +14,7 @@ using namespace ITMLib;
 namespace ITMLib
 {
 	template<class TVoxel, class TIndex>
-		bool ITMExportEngine_CPU<TVoxel, TIndex>::ExportTSDFToPcd_hashIndex(ITMScene<TVoxel, ITMVoxelBlockHash>* scene, const char *filename)
+		bool ITMExportEngine_CPU<TVoxel, TIndex>::ExportTSDFToPcd_hashIndex(ITMScene<TVoxel, ITMVoxelBlockHash>* scene, const char *basename)
 		{
 			if(!scene){ return false; }
 
@@ -58,7 +58,9 @@ namespace ITMLib
 
 			if(noPoints <= 0){ return false; }
 
-			std::ofstream file(filename);
+			std::string filename = std::string(basename) + ".pcd";
+
+			std::ofstream file(filename.c_str());
 			if(!file.is_open()){ return false; }
 
 			file << "VERSION 0.7\n";

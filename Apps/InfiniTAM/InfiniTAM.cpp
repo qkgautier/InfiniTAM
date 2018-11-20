@@ -208,7 +208,7 @@ try
 	}
 
 	ITMLibSettings *internalSettings = new ITMLibSettings();
-	internalSettings->sceneParams.viewFrustum_max = 8.f; // default is 3
+	internalSettings->sceneParams.viewFrustum_max = 5.f; // default is 3
 	internalSettings->sceneParams.voxelSize = 0.01f;
 	internalSettings->sceneParams.mu = 0.03f;
 	internalSettings->createMeshingEngine = false;
