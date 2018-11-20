@@ -11,6 +11,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <condition_variable>
 
 #include <ros/ros.h>
 #include <message_filters/subscriber.h>
@@ -36,6 +37,8 @@ private:
 	ITMShortImage* depth_image_;
 	std::thread topic_listener_thread;
 	std::mutex images_mutex_;
+	std::condition_variable condvar_;
+	bool data_available_ = false;
 
 public:
 	ROSEngine(const char *calibFilename, 

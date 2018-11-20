@@ -593,7 +593,7 @@ void UIEngine::Initialise(int & argc, char** argv, ImageSourceEngine *imageSourc
 	//outImageType[3] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
 	//outImageType[4] = ITMMainEngine::InfiniTAM_IMAGE_SCENERAYCAST;
 
-	mainLoopAction = PROCESS_PAUSED;
+	mainLoopAction = PROCESS_VIDEO;
 	mouseState = 0;
 	mouseWarped = false;
 	needsRefresh = false;

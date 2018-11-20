@@ -12,26 +12,31 @@ using namespace message_filters;
 
 void ROSEngine::processMessage(const ImageConstPtr& rgb_image_msg, const ImageConstPtr& depth_image_msg)
 {
-	std::lock_guard<std::mutex> process_message_lock(images_mutex_);
+	{
+		std::lock_guard<std::mutex> process_message_lock(images_mutex_);
 
-	// copy rgb_image_msg into rgb_image_
-	Vector4u *rgb = rgb_image_->GetData(MEMORYDEVICE_CPU);
-	for(int i = 0; i < rgb_image_->noDims.x * rgb_image_->noDims.y; i++) {
-		Vector4u newPix;
-		newPix.x = (rgb_image_msg->data)[i*3+2];
-		newPix.y = (rgb_image_msg->data)[i*3+1];
-		newPix.z = (rgb_image_msg->data)[i*3+0];
-		newPix.w = 255;
+		// copy rgb_image_msg into rgb_image_
+		Vector4u *rgb = rgb_image_->GetData(MEMORYDEVICE_CPU);
+		for(int i = 0; i < rgb_image_->noDims.x * rgb_image_->noDims.y; i++) {
+			Vector4u newPix;
+			newPix.x = (rgb_image_msg->data)[i*3+2];
+			newPix.y = (rgb_image_msg->data)[i*3+1];
+			newPix.z = (rgb_image_msg->data)[i*3+0];
+			newPix.w = 255;
 
-		rgb[i] = newPix;
+			rgb[i] = newPix;
+		}
+
+		// copy depth_image_msg into depth_image_
+		short *depth = depth_image_->GetData(MEMORYDEVICE_CPU);
+		const short *depth_msg_data  = reinterpret_cast<const short*>(depth_image_msg->data.data());
+		for(int i = 0; i < depth_image_->noDims.x * depth_image_->noDims.y; i++) {
+			depth[i] = depth_msg_data[i];
+		}
+
+		data_available_ = true;
 	}
-
-	// copy depth_image_msg into depth_image_
-	short *depth = depth_image_->GetData(MEMORYDEVICE_CPU);
-	const short *depth_msg_data  = reinterpret_cast<const short*>(depth_image_msg->data.data());
-	for(int i = 0; i < depth_image_->noDims.x * depth_image_->noDims.y; i++) {
-		depth[i] = depth_msg_data[i];
-	}
+	condvar_.notify_one(); // Notify that data are available
 }
 
 void ROSEngine::topicListenerThread()
@@ -77,7 +82,8 @@ ROSEngine::ROSEngine(const char *calibFilename,
 
 void ROSEngine::getImages(ITMUChar4Image *rgbImage, ITMShortImage *rawDepthImage)
 {
-	std::lock_guard<std::mutex> get_images_lock(images_mutex_);
+	std::unique_lock<std::mutex> get_images_lock(images_mutex_);
+	condvar_.wait(get_images_lock, [this]{return data_available_;});
 
 	rgbImage->SetFrom(rgb_image_,        MemoryBlock<Vector4u>::CPU_TO_CPU); 
 	rawDepthImage->SetFrom(depth_image_, MemoryBlock<short>::CPU_TO_CPU);
