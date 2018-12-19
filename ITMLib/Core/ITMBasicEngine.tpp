@@ -123,6 +123,16 @@ void ITMBasicEngine<TVoxel,TIndex>::SaveTSDFToFile(const char *filename)
 }
 
 template <typename TVoxel, typename TIndex>
+void ITMBasicEngine<TVoxel,TIndex>::SavePosesToFile(const char *filename)
+{
+	if (exportEngine == NULL)
+	{
+		std::cerr << "Warning: no export engine!" << std::endl;
+	}
+	exportEngine->ExportPoses(filename);
+}
+
+template <typename TVoxel, typename TIndex>
 void ITMBasicEngine<TVoxel, TIndex>::SaveToFile()
 {
 	// throws error if any of the saves fail
@@ -339,6 +349,9 @@ ITMTrackingState::TrackingResult ITMBasicEngine<TVoxel,TIndex>::ProcessFrame(ITM
 		}
 	}
 	else *trackingState->pose_d = oldPose;
+
+	// Save pose
+	trackingState->SaveCurrentPose();
 
 #ifdef OUTPUT_TRAJECTORY_QUATERNIONS
 	const ORUtils::SE3Pose *p = trackingState->pose_d;

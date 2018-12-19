@@ -215,6 +215,7 @@ try
 	internalSettings->libMode = ITMLibSettings::LIBMODE_BASIC;
 	internalSettings->deviceType = DEVICE_CUDA;
 
+
 	ITMMainEngine *mainEngine = NULL;
 	switch (internalSettings->libMode)
 	{
@@ -237,7 +238,9 @@ try
 	std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 	std::time_t current_time = std::chrono::system_clock::to_time_t(now);
 	std::stringstream ss;
+	std::stringstream ss2;
 	std::string ss_str;
+	std::string ss2_str;
 
 	std::string extension = ".pcd";
 	if (internalSettings->libMode == ITMLibSettings::LIBMODE_LOOPCLOSURE){ extension = ""; }
@@ -257,10 +260,17 @@ try
 
 		char mbstr[100];
 		std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S", std::localtime(&current_time));
-		ss << "world_" << mbstr << extension;
+		ss << "world_" << mbstr; // << extension;
 		ss_str = ss.str();
-		printf("Saving TSDF to \"%s\" ...\n", ss_str.c_str()); fflush(stdout);
+		ss2 << "poses_" << mbstr << ".txt";
+		ss2_str = ss2.str();
+		printf("Saving TSDF to \"%s%s\" ...\n", ss_str.c_str(), extension.c_str()); fflush(stdout);
 		mainEngine->SaveTSDFToFile(ss_str.c_str());
+		if (internalSettings->libMode == ITMLibSettings::LIBMODE_BASIC)
+		{
+			printf("Saving poses to \"%s\" ...\n", ss2_str.c_str()); fflush(stdout);
+			mainEngine->SavePosesToFile(ss2_str.c_str());
+		}
 
 		std::cout << "Stopping InfiniTAM..." << std::endl;
 		CLIEngine::Instance()->Shutdown();

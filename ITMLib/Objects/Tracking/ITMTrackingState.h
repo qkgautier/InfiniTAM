@@ -4,6 +4,7 @@
 
 #include "../../../ORUtils/SE3Pose.h"
 #include "../Misc/ITMPointCloud.h"
+#include <vector>
 
 namespace ITMLib
 {
@@ -34,6 +35,9 @@ namespace ITMLib
 
 		/// Current pose of the depth camera.
 		ORUtils::SE3Pose *pose_d;
+		
+		/// Pose for each frame
+		std::vector< ORUtils::Matrix4<float> > poses;
 
 		/// Tracking quality: 1.0: success, 0.0: failure
 		enum TrackingResult
@@ -70,12 +74,15 @@ namespace ITMLib
 
 			return false;
 		}
+		
+		void SaveCurrentPose(void){ poses.push_back(pose_d->GetM()); }
 
 		ITMTrackingState(Vector2i imgSize, MemoryDeviceType memoryType)
 		: pointCloud(new ITMPointCloud(imgSize, memoryType)),
 			pose_pointCloud(new ORUtils::SE3Pose),
 			pose_d(new ORUtils::SE3Pose)
 		{
+			this->poses.reserve(60000);
 			Reset();
 		}
 
@@ -93,6 +100,7 @@ namespace ITMLib
 			this->pose_pointCloud->SetFrom(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 			this->trackerResult = TRACKING_GOOD;
 			this->trackerScore = 0.0f;
+			this->poses.clear();
 		}
 
 		// Suppress the default copy constructor and assignment operator

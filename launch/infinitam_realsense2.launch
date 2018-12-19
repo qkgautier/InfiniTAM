@@ -1,0 +1,73 @@
+<launch>
+    
+  <arg name="record" default="true" />
+  <arg name="record_prefix" default="realsense" />
+
+  <arg name="playback" default="false" />
+  <arg name="playback_file" default="" />
+  
+	<!-- Kill the application at the end of the playback-->
+  <arg name="playback_kill" default="false" />
+
+	<arg name="playback_speed" default="1.0" />
+
+	<!--
+		CAN WE USE A FILTERING PARAM WITH REALSENSE 2?? THAT WOULD BE NICE.
+  <arg name="filtering" default="3" />
+	-->
+
+	<!-- 
+		CHANGE ME
+
+  <node pkg="rosbag" type="record" name="rosbag_record_realsense"
+        args="-o $(arg record_prefix)
+		      /camera/color/camera_info
+              /camera/color/image_raw/compressed
+              /camera/depth/camera_info
+              /camera/depth/image_raw
+              /camera/driver/parameter_descriptions
+              /camera/driver/parameter_updates
+              /camera/fisheye/camera_info
+              /camera/fisheye/image_raw/compressed
+              /camera/imu/data_raw
+              /camera/nodelet_manager/bond
+              /tf
+              /tf_static"
+        if="$(arg record)"/>
+	-->
+
+  <param name="/color/image_raw/compressed/jpeg_quality" type="int" value="85"/>
+
+
+	<!--
+		TODO: LAUNCH CAMERA NODE HERE
+	-->
+
+
+
+  <node name="infinitam_ros" pkg="infinitam" type="InfiniTAM" output="screen">
+		<remap from="/camera/depth/image_raw" to="/depth/image_rect_raw" />
+		<remap from="/camera/rgb/image_color" to="/color/image_raw_uncompressed" />
+		<remap from="/camera/camera_info" to="/color/camera_info" />
+  </node>
+  
+
+  <group if="$(arg playback)">
+    
+	<node pkg="image_transport" type="republish" name="decompress_image"
+          args="compressed in:=/compressed/color/image_raw out:=/color/image_raw_uncompressed" />
+	
+    <node pkg="rosbag" type="play" name="rosbag_play_realsense"
+          args="$(arg playback_file) -d 2 --clock --rate $(arg playback_speed)"
+					required="$(arg playback_kill)">
+      <remap from="/color/image_raw/compressed" to="/compressed/color/image_raw/compressed" />
+    </node>
+  </group>
+
+
+</launch>
+
+
+<!--
+	WHY AM I SCREAMING?
+-->
