@@ -6,16 +6,22 @@
   
   <arg name="playback" default="false" />
   <arg name="playback_file" default="" />
+    
+	<!-- Kill the application at the end of the playback-->
+  <arg name="playback_kill" default="false" />
+
+	<arg name="playback_speed" default="1.0" />
   
-  <node pkg="rosbag" type="record" name="rosbag_record_kinectv2"
+
+	<node pkg="rosbag" type="record" name="rosbag_record_kinectv2"
         args="-o $(arg record_prefix)
               /kinect2/bond
               /kinect2/hd/camera_info
               /kinect2/hd/image_color/compressed
-              /kinect2/sd/camera_info
-              /kinect2/sd/image_color_rect
-              /kinect2/sd/image_depth_rect
-			  /tfsensors/imu1
+              /kinect2/qhd/camera_info
+              /kinect2/qhd/image_color_rect
+              /kinect2/qhd/image_depth_rect
+              /tfsensors/imu1
               /tf
               /tf_static"
         if="$(arg record)" />
@@ -42,17 +48,24 @@
 
 
   <node name="infinitam_ros" pkg="infinitam" type="InfiniTAM" output="screen">
-		<remap from="/camera/depth/image_raw" to="/kinect2/sd/image_depth_rect" />
-		<remap from="/camera/rgb/image_color" to="/kinect2/sd/image_color_rect" />
-		<remap from="/camera/camera_info" to="/kinect2/sd/camera_info" />
+		<remap from="/camera/depth/image_raw" to="/kinect2/qhd/image_depth_rect" />
+		<remap from="/camera/rgb/image_color" to="/kinect2/qhd/image_color_rect" />
+		<remap from="/camera/camera_info" to="/kinect2/qhd/camera_info" />
   </node>
 
 
 
-  
-  <node pkg="rosbag" type="play" name="rosbag_play_kinectv2"
-        args="$(arg playback_file) -d 2 --clock"
-		if="$(arg playback)" />
-  
+  <group if="$(arg playback)">
+    
+    <node pkg="image_transport" type="republish" name="decompress_image"
+          args="compressed in:=/compressed/rgb/image_rect_color out:=/kinect2/qhd/image_color_rect" />
+	
+    <node pkg="rosbag" type="play" name="rosbag_play_kinectv2"
+          args="$(arg playback_file) -d 2 --clock --rate $(arg playback_speed)"
+					required="$(arg playback_kill)" >
+      <remap from="/kinect2/qhd/image_color_rect/compressed" to="/compressed/rgb/image_rect_color/compressed" />
+    </node>
+  </group>
+ 
 
 </launch>

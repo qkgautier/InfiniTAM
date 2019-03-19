@@ -2,10 +2,13 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <chrono>
+#include <sstream>
 
 #include <ros/ros.h>
 
 #include "UIEngine.h"
+#include "../InfiniTAM_cli/CLIEngine.h"
 
 #include "../../InputSource/ROSEngine.h"
 #include "../../InputSource/OpenNIEngine.h"
@@ -212,6 +215,7 @@ try
 	internalSettings->libMode = ITMLibSettings::LIBMODE_LOOPCLOSURE;
 	internalSettings->deviceType = DEVICE_CUDA;
 
+
 	ITMMainEngine *mainEngine = NULL;
 	switch (internalSettings->libMode)
 	{
@@ -229,9 +233,49 @@ try
 		break;
 	}
 
-	UIEngine::Instance()->Initialise(argc, argv, imageSource, imuSource, mainEngine, "./Files/Out", internalSettings->deviceType);
-	UIEngine::Instance()->Run();
-	UIEngine::Instance()->Shutdown();
+
+	// Note: requires c++11
+	std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+	std::time_t current_time = std::chrono::system_clock::to_time_t(now);
+	std::stringstream ss;
+	std::stringstream ss2;
+	std::string ss_str;
+	std::string ss2_str;
+
+	std::string extension = ".pcd";
+	if (internalSettings->libMode == ITMLibSettings::LIBMODE_LOOPCLOSURE){ extension = ""; }
+
+
+	if (false)
+	{
+		UIEngine::Instance()->Initialise(argc, argv, imageSource, imuSource, mainEngine, "./Files/Out", internalSettings->deviceType);
+		UIEngine::Instance()->Run();
+		UIEngine::Instance()->Shutdown();
+	}
+	else 
+	{
+		CLIEngine::Instance()->Initialise(imageSource, imuSource, mainEngine, internalSettings->deviceType);
+		std::cout << "Starting InfiniTAM..." << std::endl;
+		CLIEngine::Instance()->Run();
+
+		char mbstr[100];
+		std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S", std::localtime(&current_time));
+		ss << "world_" << mbstr; // << extension;
+		ss_str = ss.str();
+		ss2 << "poses_" << mbstr << ".txt";
+		ss2_str = ss2.str();
+		printf("Saving TSDF to \"%s%s\" ...\n", ss_str.c_str(), extension.c_str()); fflush(stdout);
+		mainEngine->SaveTSDFToFile(ss_str.c_str());
+		if (internalSettings->libMode == ITMLibSettings::LIBMODE_BASIC)
+		{
+			printf("Saving poses to \"%s\" ...\n", ss2_str.c_str()); fflush(stdout);
+			mainEngine->SavePosesToFile(ss2_str.c_str());
+		}
+
+		std::cout << "Stopping InfiniTAM..." << std::endl;
+		CLIEngine::Instance()->Shutdown();
+		std::cout << "InfiniTAM stopped" << std::endl;
+	}
 
 	delete mainEngine;
 	delete internalSettings;

@@ -31,10 +31,12 @@ INCLUDE(${PROJECT_SOURCE_DIR}/cmake/UseUVC.cmake)
 SET(sources
 InfiniTAM.cpp
 UIEngine.cpp
+../InfiniTAM_cli/CLIEngine.cpp
 )
 
 SET(headers
 UIEngine.h
+../InfiniTAM_cli/CLIEngine.h
 )
 
 #############################

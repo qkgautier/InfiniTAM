@@ -65,6 +65,9 @@ namespace ITMLib
 
 		/// Save the TSDF as a point cloud
 		void SaveTSDFToFile(const char *filename);
+		
+		/// Save poses as a text file in KITTI format
+		void SavePosesToFile(const char *filename);
 
 		/// save and load the full scene and relocaliser (if any) to/from file
 		void SaveToFile();

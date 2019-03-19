@@ -26,14 +26,23 @@ namespace ITMLib
 
 				virtual bool ExportPoses(const char* filename)
 				{
-					//if(!trackingState_){ return false; }
-					//std::ofstream file(filename);
-					//if(!file.is_open()){ return false; }
+					if(!trackingState_){ return false; }
+					std::ofstream file(filename);
+					if(!file.is_open()){ return false; }
 
-					//for(size_t i = 0; i < trackingState_->poses.size(); i++)
-					//{
-					//	file << trackingState_->poses[i];
-					//}
+					for(size_t i = 0; i < trackingState_->poses.size(); i++)
+					{
+						ORUtils::Matrix4<float>& m = trackingState_->poses[i];
+						ORUtils::Matrix4<float> mInv;
+						m.inv(mInv);
+						for (int r = 0; r < 3; r++)
+							for (int c = 0 ; c < 4; c++)
+							{
+								file << mInv(c,r);
+								if (c != 3 || r != 2){ file << " "; }
+							}
+						file << "\n";
+					}
 					return true;
 				}
 
