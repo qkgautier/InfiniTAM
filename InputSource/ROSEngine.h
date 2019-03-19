@@ -6,6 +6,7 @@
 #include "ImageSourceEngine.h"
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -35,6 +36,8 @@ private:
 	ros::Subscriber rgb_sub_, depth_sub_;
 	ITMUChar4Image* rgb_image_;
 	ITMShortImage* depth_image_;
+	double depth_time_;
+	std::ofstream log_file_;
 	std::thread topic_listener_thread;
 	std::mutex images_mutex_;
 	std::condition_variable condvar_;

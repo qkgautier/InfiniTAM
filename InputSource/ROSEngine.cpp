@@ -30,6 +30,7 @@ void ROSEngine::processMessage(const ImageConstPtr& rgb_image_msg, const ImageCo
 		// copy depth_image_msg into depth_image_
 		short *depth = depth_image_->GetData(MEMORYDEVICE_CPU);
 		const short *depth_msg_data  = reinterpret_cast<const short*>(depth_image_msg->data.data());
+		depth_time_ = depth_image_msg->header.stamp.toSec();
 		for(int i = 0; i < depth_image_->noDims.x * depth_image_->noDims.y; i++) {
 			depth[i] = depth_msg_data[i];
 		}
@@ -57,9 +58,17 @@ ROSEngine::ROSEngine(const char *calibFilename,
 			BaseImageSourceEngine(calibFilename),
 			nh_(),
 			rgb_image_(0),
-			depth_image_(0)
+			depth_image_(0),
+			depth_time_(0.0)
 {
 	this->calib.disparityCalib.SetStandard(); // assumes depth is in millimeters
+
+	stringstream ss;
+	ss << ros::Time::now() << ".txt";
+	string ss_str = ss.str();
+	log_file_.open(ss_str.c_str());
+	log_file_.precision(20);
+	cout << "Saving ROS timestamps to \"" << ss_str << "\"" << endl;
 
 	// Wait for camera info
 	printf("Waiting for camera info...\n");
@@ -88,6 +97,11 @@ void ROSEngine::getImages(ITMUChar4Image *rgbImage, ITMShortImage *rawDepthImage
 
 	rgbImage->SetFrom(rgb_image_,        MemoryBlock<Vector4u>::CPU_TO_CPU); 
 	rawDepthImage->SetFrom(depth_image_, MemoryBlock<short>::CPU_TO_CPU);
+
+	log_file_ << depth_time_ << "\n";
+	//log_file_.flush(); // Must delete the object to flush
+	
+	//data_available_ = false;
 }
 
 bool ROSEngine::hasMoreImages(void) const
@@ -109,6 +123,7 @@ ROSEngine::~ROSEngine()
 {
 	if(rgb_image_){ delete rgb_image_; }
 	if(depth_image_){ delete depth_image_; }
+	if (log_file_.is_open()) { log_file_.close(); }
 }
 
 
