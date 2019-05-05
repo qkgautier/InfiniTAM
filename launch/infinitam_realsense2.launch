@@ -17,7 +17,7 @@
   <node pkg="rosbag" type="record" name="rosbag_record_realsense2"
         args="-o $(arg record_prefix)
               /aligned_depth_to_color/image_raw
-		      /color/camera_info
+		          /color/camera_info
               /color/image_raw/compressed
               /depth/camera_info
               /depth/image_rect_raw
@@ -56,9 +56,9 @@
 
 
   <node name="infinitam_ros" pkg="infinitam" type="InfiniTAM" output="screen">
-	  <remap from="/camera/depth/image_raw" to="/aligned_depth_to_color/image_raw" />
+	  <remap from="/camera/depth/image_raw" to="/depth/image_rect_raw" />
 	  <remap from="/camera/rgb/image_color" to="/color/image_raw" />
-	  <remap from="/camera/camera_info" to="/color/camera_info" />
+	  <remap from="/camera/camera_info" to="/depth/camera_info" />
   </node>
 
 

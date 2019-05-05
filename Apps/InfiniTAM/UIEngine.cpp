@@ -676,7 +676,12 @@ void UIEngine::ProcessFrame()
 	currentFrameNo++;
 }
 
-void UIEngine::Run() { glutMainLoop(); }
+void UIEngine::Run()
+{
+	mainLoopAction = PROCESS_VIDEO;
+	glutMainLoop();
+}
+
 void UIEngine::Shutdown()
 {
 	sdkDeleteTimer(&timer_instant);

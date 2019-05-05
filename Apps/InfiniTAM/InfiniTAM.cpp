@@ -212,7 +212,7 @@ try
 	internalSettings->sceneParams.voxelSize = 0.01f;
 	internalSettings->sceneParams.mu = 0.03f;
 	internalSettings->createMeshingEngine = false;
-	internalSettings->libMode = ITMLibSettings::LIBMODE_LOOPCLOSURE;
+	internalSettings->libMode = ITMLibSettings::LIBMODE_BASIC;
 	internalSettings->deviceType = DEVICE_CUDA;
 
 
@@ -246,11 +246,29 @@ try
 	if (internalSettings->libMode == ITMLibSettings::LIBMODE_LOOPCLOSURE){ extension = ""; }
 
 
-	if (false)
+	if (true)
 	{
 		UIEngine::Instance()->Initialise(argc, argv, imageSource, imuSource, mainEngine, "./Files/Out", internalSettings->deviceType);
+		std::cout << "Starting InfiniTAM..." << std::endl;
 		UIEngine::Instance()->Run();
+
+		char mbstr[100];
+		std::strftime(mbstr, sizeof(mbstr), "%Y_%m_%d_%H_%M_%S", std::localtime(&current_time));
+		ss << "world_" << mbstr; // << extension;
+		ss_str = ss.str();
+		ss2 << "poses_" << mbstr << ".txt";
+		ss2_str = ss2.str();
+		printf("Saving TSDF to \"%s%s\" ...\n", ss_str.c_str(), extension.c_str()); fflush(stdout);
+		mainEngine->SaveTSDFToFile(ss_str.c_str());
+		if (internalSettings->libMode == ITMLibSettings::LIBMODE_BASIC)
+		{
+			printf("Saving poses to \"%s\" ...\n", ss2_str.c_str()); fflush(stdout);
+			mainEngine->SavePosesToFile(ss2_str.c_str());
+		}
+
+		std::cout << "Stopping InfiniTAM..." << std::endl;
 		UIEngine::Instance()->Shutdown();
+		std::cout << "InfiniTAM stopped" << std::endl;
 	}
 	else 
 	{
