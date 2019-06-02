@@ -25,7 +25,6 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(catkin_simple REQUIRED)
 catkin_simple(ALL_DEPS_REQUIRED)
 
-
 find_package(Boost REQUIRED
   system
 )
@@ -41,6 +40,9 @@ include_directories(
 #  CATKIN_DEPENDS roscpp visualization_msgs
 #  DEPENDS system_lib
 #)
+
+find_package(OpenCV)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 #####################
 # Offer ROS Support (Disable as my modifications were based on a pull request and not on infinitam_v3.5) #
